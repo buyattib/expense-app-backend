@@ -1,0 +1,25 @@
+
+services:
+  mailcatcher:
+    image: sj26/mailcatcher
+    container_name: "expense-mail-catcher"
+    ports:
+      - '${EMAIL_PORT}:${EMAIL_PORT}'   # SMTP server host:container
+      - '${EMAIL_INTERFACE}:${EMAIL_INTERFACE}'   # Web interface host:container
+
+  # redis:
+  #     image: redis:7-alpine
+  #     container_name: "expense-redis"
+  #     ports:
+  #       - "6379:6379"
+  #     environment:
+  #       - REDIS_PASSWORD=your_strong_password
+  #       - REDIS_USERNAME=myuser
+  #     volumes:
+  #       - redis-data:/data
+  # redis://<username>:<password>@<host>:<port>
+  # url_connection = redis.from_url("redis://myuser:your_strong_password@localhost:6379", decode_responses=True)
+
+# volumes:
+#   redis-data:
+#     name: redis-data
