@@ -62,5 +62,5 @@ class Account(Base):
             "currency_id",
             "account_type_id",
         ),
-        CheckConstraint(balance > 0, name="balance_gt_0"),
+        CheckConstraint(balance >= 0, name="balance_gte_0"),
     )
