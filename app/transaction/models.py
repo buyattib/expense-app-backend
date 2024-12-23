@@ -24,6 +24,7 @@ if TYPE_CHECKING:
 #   they want to add selected ones so they dont have to do it manually.
 # - in those categories include a "transfer between accounts one" as
 #   intra account transfers will be just another category.
+# - new model to tack transfers between accounts
 
 
 class TransactionCategory(Base):
@@ -51,7 +52,7 @@ class TransactionCategory(Base):
     )
 
 
-# with this approach i cant establish a relation between transfers
+# only for incomes and expenses
 class Transaction(Base):
     __tablename__ = "transactions"
 

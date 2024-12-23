@@ -20,9 +20,15 @@ def create_transaction_category(
     current_user: CurrentUserDep,
     transaction_category_data: schemas.TransactionCategoryBase,
 ):
-    return crud.create_transaction_category(
-        session, current_user.id, transaction_category_data
-    )
+    try:
+        return crud.create_transaction_category(
+            session, current_user.id, transaction_category_data
+        )
+    except Exception as e:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail=str(e),
+        )
 
 
 @transaction_category_router.get(
@@ -53,6 +59,7 @@ def get_transaction_category(
     return transaction_category
 
 
+# TODO: list of common tx categories to suggest the users
 # @transaction_category_router.post(
 #     "/common", response_model=List[schemas.TransactionCategorySchema]
 # )
@@ -86,10 +93,16 @@ def create_transaction(
     current_user: CurrentUserDep,
     transaction_data: schemas.TransactionBase,
 ):
-    return crud.create_transaction(session, current_user.id, transaction_data)
+    try:
+        return crud.create_transaction(session, current_user.id, transaction_data)
+    except Exception as e:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail=str(e),
+        )
 
 
-@transaction_router.get("/", response_model=list[schemas.TransactionSchema])
+@transaction_router.get("/", response_model=list[schemas.TransactionExtended])
 def get_transactions(session: database.SessionDep, current_user: CurrentUserDep):
     return crud.get_transactions(session, current_user.id)
 

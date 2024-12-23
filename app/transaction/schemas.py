@@ -3,6 +3,8 @@ from typing import Annotated, Optional, List
 from pydantic import BaseModel, ConfigDict, TypeAdapter
 from pydantic.types import StringConstraints, PositiveInt
 
+from app.account import schemas as account_schemas
+
 from .constants import TransactionType
 
 
@@ -42,7 +44,15 @@ class TransactionSchema(TransactionBase):
 ### parameters and responses -----------
 
 
+class TransactionExtended(TransactionSchema):
+    transaction_category: TransactionCategorySchema
+    account: account_schemas.AccountSchema
+
+    model_config = ConfigDict(from_attributes=True)
+
+
 ### pydantinc list adapters
 
 TransactionCategorySchemaListAdapter = TypeAdapter(List[TransactionCategorySchema])
 TransactionSchemaListAdapter = TypeAdapter(List[TransactionSchema])
+TransactionExtendedListAdapter = TypeAdapter(List[TransactionExtended])

@@ -62,7 +62,7 @@ def get_accounts(session: database.SessionDep, current_user: CurrentUserDep):
     return accounts
 
 
-@account_router.get("/{account_id}", response_model=schemas.AccountExtended)
+@account_router.get("/{account_id}", response_model=schemas.AccountSchema)
 def get_account(
     session: database.SessionDep,
     current_user: CurrentUserDep,

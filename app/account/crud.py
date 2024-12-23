@@ -80,14 +80,9 @@ def get_accounts(session: Session, user_id: str):
 
 
 def get_account(session: Session, account_id: str):
-    stmt = (
-        select(models.Account, models.Currency, models.AccountType)
-        .where(
-            models.Account.id == account_id,
-            models.Account.deleted == False,
-        )
-        .join(models.Currency)
-        .join(models.AccountType)
+    stmt = select(models.Account).where(
+        models.Account.id == account_id,
+        models.Account.deleted == False,
     )
     result = session.scalars(stmt).first()
     return result
