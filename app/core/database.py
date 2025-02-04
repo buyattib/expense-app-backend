@@ -8,21 +8,30 @@ from sqlalchemy.sql import func
 
 from app.config import settings
 
+"""
++driver and /database are optional (database is the name of the db). Common drivers: psycopg2, pg8000
+
+pg connection string: postgresql+driver://user:password@host:port/database
+
+example: postgresql://bautista:pg123abc@localhost:5433/postgres # from host
+example: postgresql://bautista:pg123abc@localhost:5432/postgres # from compose
+example: postgresql://bautista:pg123abc@container-name/postgres # from compose
+"""
 
 # Connection to db
 engine = create_engine(
-    url=settings.sqlalchemy_database_uri,
+    url=str(settings.sqlalchemy_database_uri),
     echo=True,
-    connect_args={"check_same_thread": False},  # only for sqlite
+    # connect_args={"check_same_thread": False},  # only for sqlite
 )
 
 
-# only for sqlite
-@event.listens_for(engine, "connect")
-def enable_foreign_keys(dbapi_connection, connection_record):
-    cursor = dbapi_connection.cursor()
-    cursor.execute("PRAGMA foreign_keys=ON")
-    cursor.close()
+# # only for sqlite
+# @event.listens_for(engine, "connect")
+# def enable_foreign_keys(dbapi_connection, connection_record):
+#     cursor = dbapi_connection.cursor()
+#     cursor.execute("PRAGMA foreign_keys=ON")
+#     cursor.close()
 
 
 # Session passed to each endpoint
@@ -47,11 +56,6 @@ class Base(DeclarativeBase):
         DateTime(timezone=True),
         server_default=func.now(),
     )
-    # created: Mapped[datetime] = mapped_column(
-    #     TIMESTAMP(timezone=True),
-    #     server_default=func.now(),
-    #     server_default=text("now()"),
-    # )
     updated: Mapped[datetime] = mapped_column(
         DateTime(timezone=True), onupdate=func.now(), nullable=True
     )

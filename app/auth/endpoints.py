@@ -12,20 +12,21 @@ from . import schemas, crud, utils
 router = APIRouter(prefix="/auth", tags=["Auth"])
 
 
+# TODO: build a rate limiter to use with email and ip
+
+
 @router.post("/email-link")
 async def email_link(
     session: database.SessionDep,
-    body: schemas.MagicLogin,
     background_tasks: BackgroundTasks,
+    body: schemas.MagicLogin,
 ):
-
-    # TODO: build a rate limiter to use with email and ip
 
     user = user_crud.get_user_by_email(session, email=body.email)
 
     token_data = schemas.TokenPayloadCreate(
         sub=body.email,
-        id=user.id if user else "0",
+        id=user.id if user else None,
     )
     magic_token = utils.generate_token(
         token_data=token_data,
@@ -47,7 +48,9 @@ async def email_link(
 
     # send email task
     background_tasks.add_task(
-        fast_mail.send_message, message, template_name="login.html"
+        fast_mail.send_message,
+        message,
+        template_name="login.html",
     )
 
     return {"message": "An email was sent"}

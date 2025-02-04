@@ -46,9 +46,15 @@ def create_account(
     session: database.SessionDep,
     current_user: CurrentUserDep,
     account_data: schemas.AccountBase,
+    sub_accounts_data: List[schemas.SubAccountParameter],
 ):
     try:
-        return crud.create_account(session, current_user.id, account_data)
+        return crud.create_account(
+            session,
+            current_user.id,
+            account_data,
+            sub_accounts_data,
+        )
     except Exception as e:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
@@ -77,16 +83,14 @@ def get_account(
     return account
 
 
-# populate constats tables
+# populate constants tables
 
 
 @currency_router.post(
     "/",
-    # response_model=schemas.CurrencyResponse
 )
 def create_currency(
     session: database.SessionDep,
-    # currency_data: schemas.CurrencyBase,
 ):
     currencies_data = [
         schemas.CurrencyBase(name="Argentine Peso", code="ARS"),
@@ -102,17 +106,18 @@ def create_currency(
 
 @account_type_router.post(
     "/",
-    # response_model=schemas.AccountTypeResponse
 )
 def create_account_type(
     session: database.SessionDep,
-    # account_type_data: schemas.AccountTypeBase,
 ):
+    from .constants import AccountTypeEnum
+
     account_types_data = [
-        schemas.AccountTypeBase(name="Cash", code="cash"),
-        schemas.AccountTypeBase(name="Bank", code="bank"),
-        schemas.AccountTypeBase(name="Digital Wallet", code="digital_wallet"),
-        schemas.AccountTypeBase(name="Crypto Wallet", code="crypto_wallet"),
+        schemas.AccountTypeBase(
+            name=" ".join(at.value.split("_")).title(),
+            code=at,
+        )
+        for at in AccountTypeEnum
     ]
 
     for account_type_data in account_types_data:

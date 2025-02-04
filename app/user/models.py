@@ -1,9 +1,10 @@
+import uuid
 from typing import List, Optional
-from sqlalchemy import String
+from sqlalchemy import func
 from sqlalchemy.orm import Mapped, mapped_column, relationship
+from sqlalchemy.dialects.postgresql import UUID
 
 from app.core.database import Base
-from app.lib.utils import generate_uuid
 
 from app.transaction.models import TransactionCategory, Transaction
 from app.account.models import Account
@@ -12,7 +13,11 @@ from app.account.models import Account
 class User(Base):
     __tablename__ = "users"
 
-    id: Mapped[str] = mapped_column(String(36), primary_key=True, default=generate_uuid)
+    id: Mapped[uuid.UUID] = mapped_column(
+        UUID,
+        primary_key=True,
+        server_default=func.gen_random_uuid(),
+    )
     email: Mapped[str] = mapped_column(unique=True, index=True)
     first_name: Mapped[Optional[str]]
     last_name: Mapped[Optional[str]]

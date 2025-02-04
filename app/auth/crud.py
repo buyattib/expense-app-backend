@@ -55,7 +55,7 @@ def validate_new_user(session: Session, token: str, secret_key: str):
         raise credentials_exception
 
     email = payload.sub
-    if email is None or payload.id != "0":
+    if email is None or payload.id is not None:
         raise credentials_exception
 
     user = user_crud.get_user_by_email(session, email=email)

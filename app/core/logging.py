@@ -1,7 +1,7 @@
-import logging
-import sys
 from fastapi import Request
 from starlette.middleware.base import BaseHTTPMiddleware
+import logging
+import sys
 
 logger = logging.getLogger()
 
@@ -25,14 +25,15 @@ class LoggerMiddleware(BaseHTTPMiddleware):
     async def dispatch(self, request: Request, call_next):
         method = request.method
 
-        if method in ["POST", "PUT", "PATCH"]:
+        if method != "GET":
             pass
-        elif method in ["GET"]:
+        else:
             pass
 
         # TODO: add info of the requester: ip, domain, etc
         ip = request.client.host if request.client else None
         log = {"path": request.url.path, "method": method, "ip": ip}
+
         logger.info(log, extra=log)
 
         response = await call_next(request)

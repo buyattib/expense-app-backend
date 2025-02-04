@@ -9,9 +9,9 @@ from app.config import settings
 conf = ConnectionConfig(
     MAIL_USERNAME="",
     MAIL_PASSWORD="",
-    MAIL_FROM="test@example.com",
+    MAIL_FROM="expense-app@mail.com",
     MAIL_PORT=settings.email_port,
-    MAIL_SERVER=settings.email_server,
+    MAIL_SERVER=settings.email_container_name,
     MAIL_FROM_NAME="my name",
     MAIL_STARTTLS=False,
     MAIL_SSL_TLS=False,

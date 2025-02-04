@@ -2,10 +2,69 @@
 services:
   mailcatcher:
     image: sj26/mailcatcher
-    container_name: "expense-mail-catcher"
+    container_name: expense-app-mail
     ports:
       - '${EMAIL_PORT}:${EMAIL_PORT}'   # SMTP server host:container
       - '${EMAIL_INTERFACE}:${EMAIL_INTERFACE}'   # Web interface host:container
+
+  postgres-db:
+    image: postgres:latest
+    container_name: "${PG_CONTAINER_NAME}"
+    restart: always
+    environment:
+      # required by the image
+      - PGDATA=/var/lib/postgresql/data
+      - POSTGRES_USER=${PG_USER}
+      - POSTGRES_PASSWORD=${PG_PASSWORD}
+      - POSTGRES_DB=${PG_DB}
+    ports:
+      - "${PG_PORT}:${PG_PORT}" # host:container
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${PG_USER} -d ${PG_DB}"]
+      interval: 10s
+      timeout: 10s
+      retries: 5
+    volumes:
+      - pg:/var/lib/postgresql/data # host:container
+
+  pgadmin:
+    container_name: expense-app-pgadmin
+    image: dpage/pgadmin4:latest
+    restart: always
+    environment:
+      - PGADMIN_DEFAULT_EMAIL=${PGADMIN_DEFAULT_EMAIL}
+      - PGADMIN_DEFAULT_PASSWORD=${PGADMIN_DEFAULT_PASSWORD}
+    ports:
+      - "5050:80" # host:container
+    depends_on:
+      postgres-db:
+        condition: service_healthy
+    volumes:
+      # to persist pgadmin session data
+      - pg_admin:/var/lib/pgadmin # host:container
+
+  api:
+    image: expense-app:latest
+    container_name: expense-app-api
+    restart: always
+    build:
+      context: .
+    ports:
+      - '${API_PORT}:${API_PORT}' # host:container
+    # develop:
+    #   watch:
+    #     - action: sync
+    #       path: .
+    #       target: /code
+    env_file:
+      # so the .env file is available inside the container
+      - .env 
+    depends_on:
+      postgres-db:
+        condition: service_healthy
+    volumes:
+      # to update code changes on development
+      - ./app:/code/app # host:container
 
   # redis:
   #     image: redis:7-alpine
@@ -23,3 +82,9 @@ services:
 # volumes:
 #   redis-data:
 #     name: redis-data
+
+volumes:
+  # to persist db
+  pg:
+  # to persist pgadmin session data
+  pg_admin:

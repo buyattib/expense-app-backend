@@ -1,6 +1,7 @@
+from uuid import UUID
 from datetime import datetime
 from typing import Annotated, Optional, List
-from pydantic import BaseModel, ConfigDict, TypeAdapter
+from pydantic import BaseModel, ConfigDict, TypeAdapter, field_validator
 from pydantic.types import StringConstraints, PositiveInt
 
 from app.account import schemas as account_schemas
@@ -23,6 +24,16 @@ class TransactionCategorySchema(TransactionCategoryBase):
 
     model_config = ConfigDict(from_attributes=True)
 
+    @field_validator("id", mode="before")
+    @classmethod
+    def id_to_string(cls, v):
+        return str(v) if isinstance(v, UUID) else v
+
+    @field_validator("user_id", mode="before")
+    @classmethod
+    def user_id_to_string(cls, v):
+        return str(v) if isinstance(v, UUID) else v
+
 
 # transactions ---
 class TransactionBase(BaseModel):
@@ -31,7 +42,12 @@ class TransactionBase(BaseModel):
     description: Optional[str] = None
     transaction_type: TransactionType
     transaction_category_id: str
-    account_id: str
+    sub_account_id: str
+
+    @field_validator("sub_account_id", mode="before")
+    @classmethod
+    def account_id_to_string(cls, v):
+        return str(v) if isinstance(v, UUID) else v
 
 
 class TransactionSchema(TransactionBase):
@@ -39,6 +55,16 @@ class TransactionSchema(TransactionBase):
     user_id: str
 
     model_config = ConfigDict(from_attributes=True)
+
+    @field_validator("id", mode="before")
+    @classmethod
+    def id_to_string(cls, v):
+        return str(v) if isinstance(v, UUID) else v
+
+    @field_validator("user_id", mode="before")
+    @classmethod
+    def user_id_to_string(cls, v):
+        return str(v) if isinstance(v, UUID) else v
 
 
 ### parameters and responses -----------

@@ -1,5 +1,6 @@
+from uuid import UUID
 from typing import List, Optional
-from pydantic import ConfigDict, TypeAdapter, EmailStr, BaseModel
+from pydantic import ConfigDict, TypeAdapter, EmailStr, BaseModel, field_validator
 
 
 ### schemas -----------
@@ -17,6 +18,11 @@ class UserSchema(UserBase):
     id: str
 
     model_config = ConfigDict(from_attributes=True)
+
+    @field_validator("id", mode="before")
+    @classmethod
+    def convert_uuid_to_str(cls, v):
+        return str(v) if isinstance(v, UUID) else v
 
 
 ### parameters and responses -----------

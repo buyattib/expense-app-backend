@@ -1,16 +1,18 @@
 from fastapi import FastAPI
+
 from fastapi.middleware.cors import CORSMiddleware
 
 from app.config import settings
-from app.lib.utils import parse_cors
+
 from app.core.database import Base, engine
+
 from app.core.logging import logger, LoggerMiddleware
-from app.core.rate_limiting import RateLimiterMiddleware
+
+# from app.core.rate_limiting import RateLimiterMiddleware
 
 # routers
 from app.auth.endpoints import router as auth_router
 from app.user.endpoints import router as user_router
-
 from app.transaction.endpoints import (
     transaction_category_router,
     transaction_router,
@@ -25,7 +27,6 @@ app = FastAPI(
     root_path=f"/api/{settings.api_version}",
 )
 
-
 # create database: delete this when using migrations with alembic
 Base.metadata.create_all(bind=engine)
 
@@ -34,12 +35,12 @@ Base.metadata.create_all(bind=engine)
 app.add_middleware(LoggerMiddleware)
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=parse_cors(settings.backend_cors_origins),
+    allow_origins=settings.backend_cors_origins,
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
 )
-app.add_middleware(RateLimiterMiddleware)
+# app.add_middleware(RateLimiterMiddleware)
 
 
 # routers -----------

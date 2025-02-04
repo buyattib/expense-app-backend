@@ -10,7 +10,7 @@ router = APIRouter(
 
 
 @router.get("/me", response_model=schemas.UserSchema)
-def read_users_me(
+def read_user_me(
     current_user: CurrentUserDep,
 ):
     return current_user

@@ -1,44 +1,66 @@
-## Getting started (placed in backend dir):
+# Getting started (in backend dir):
 
-### Installing everything (to run locally or to have editor support otherwise use docker):
+
+## Installing everything (to have editor support):
     - Create virtual env: python -m venv .venv
     - Activate virtual env: source .venv/bin/activate
     - Upgrade pip if necessary: pip install --upgrade pip
     - Install requirements: pip install -r ./requirements.txt
 
 
-### To update the requirements.txt with installed dependency: 
-- pip freeze > ./requirements.txt
 
-
-### Run the api:
-- fastapi dev app/main.py
-
-
-### Database Migrations:
-
-- Always check the generated file and look at constraints, indexes, etc. to add names to them if they are not part of the naming dictionary.
-
-## Inside the api container (if its being run with docker):
-- create a revision (./src/alembic/versions/): alembic revision --autogenerate -m "migration name"
-- make the migration: alembic upgrade head
-
-
-## Using Docker compose:
-
-### To run all the services with docker compose (using down to stop deletes everything):
-- start: docker compose -f compose.yml up
-- stop: docker compose -f compose.yml down
-
-### Add the --build flag to rebuild images with latest code
-docker compose -f compose.yml up --build
-
-### Add the --project-name flag to give a custom name
+## Run the app (need to install docker and docker compose):
 - start: docker compose --project-name expense-app -f compose.yml up --build
 - stop: docker compose --project-name expense-app -f compose.yml down
 
+To test:
+- start with watch: docker compose --project-name expense-app -f compose.yml up --build --watch
 
-### When the container is running enter it with:
-- docker exec -it expense-app bash
 
 
+## Update the requirements.txt when installing dependencies: 
+- pip freeze > ./requirements.txt
+
+
+
+## Database Migrations:
+- Always check the generated file and look at constraints, indexes, etc. to add names to them if they are not part of the naming dictionary.
+
+### Inside the api container:
+- create a revision (a new file is going to be created at ./app/alembic/versions/): alembic revision --autogenerate -m "migration name"
+- make the migration: alembic upgrade head
+
+
+
+## PgAdmin:
+
+### To connect to the db in pgadmin (containerized and running in localhost:5050):
+- hostname: expense-app-pg (container name)
+- port: 5432 (container port)
+- database: db name
+- username: (pg username)
+- password: (pg password)
+
+### To connect to the db in pgadmin (external):
+- hostname: localhost
+- port: 5432
+- database: db name
+- username: (pg username)
+- password: (pg password)
+
+
+
+## Docker:
+When using docker compose, an internal network for the containers is created.
+If not stoping the containers with down command, the containers, images, networks and volumes are not deleted.
+
+- When the container is running enter it with: docker exec -it expense-app bash
+- List running containers: docker container ls
+- List all containers: docker container ls -a
+- Remove a container: docker container rm <container_id>
+- List images: docker image ls
+- Remove an image: docker image rm <image_id>
+- List networks: docker network ls
+- Remove network: docker network rm <network_id>
+- List volumes: docker volume ls
+- Remove volume: docker volume rm <volume_id>
