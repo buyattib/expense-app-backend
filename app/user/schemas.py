@@ -25,7 +25,9 @@ class UserSchema(UserBase):
         return str(v) if isinstance(v, UUID) else v
 
 
-### parameters and responses -----------
+### extended ----------
+
+### parameters -----------
 
 
 class UserCreate(BaseModel):

@@ -1,5 +1,5 @@
 from uuid import UUID
-from typing import List
+from typing import List, Union
 from sqlalchemy import select
 from sqlalchemy.orm import Session
 
@@ -49,8 +49,7 @@ def get_account_types(session: Session):
 def create_account(
     session: Session,
     user_id: UUID,
-    account_data: schemas.AccountBase,
-    sub_accounts_data: List[schemas.SubAccountParameter],
+    account_data: schemas.CreateAccountParameters,
 ):
     same_account_stmt = select(models.Account).where(
         models.Account.user_id == user_id,
@@ -66,24 +65,31 @@ def create_account(
         if not same_account.deleted:
             raise Exception("The account already exists")
 
-        if same_account.deleted:
+        else:
             same_account.deleted = False
             session.add(same_account)
             session.commit()
             session.refresh(same_account)
             return same_account
 
-    db_account = models.Account(**account_data.model_dump(), user_id=user_id)
+    db_account = models.Account(
+        user_id=user_id,
+        name=account_data.name,
+        description=account_data.description,
+        account_type_id=account_data.account_type_id,
+    )
     session.add(db_account)
+    session.commit()
+    session.refresh(db_account)
 
-    currency_ids = [sub_acc.currency_id for sub_acc in sub_accounts_data]
+    currency_ids = [sub_acc.currency_id for sub_acc in account_data.sub_accounts]
     currencies = session.scalars(
-        select(models.Currency).where(models.Currency.id._in(currency_ids))
+        select(models.Currency).where(models.Currency.id.in_(currency_ids))
     ).all()
     if len(currencies) != len(currency_ids):
-        raise Exception("Some of the passed currencies are invalid")
+        raise Exception("Some of the selected currencies are invalid")
 
-    for sub_acc in sub_accounts_data:
+    for sub_acc in account_data.sub_accounts:
         sub_account = models.SubAccount(
             account_id=db_account.id,
             currency_id=sub_acc.currency_id,
@@ -92,7 +98,6 @@ def create_account(
         session.add(sub_account)
 
     session.commit()
-    session.refresh(db_account)
 
     return db_account
 
@@ -120,10 +125,44 @@ def get_accounts(session: Session, user_id: UUID):
     return result
 
 
-def get_account(session: Session, account_id: str):
+def get_account(session: Session, account_id: Union[UUID, str]):
     stmt = select(models.Account).where(
         models.Account.id == account_id,
         models.Account.deleted == False,
     )
     result = session.scalars(stmt).first()
+    return result
+
+
+# sub account ----
+
+
+def get_sub_account(session: Session, sub_account_id: Union[UUID, str]):
+    stmt = select(models.SubAccount).where(
+        models.SubAccount.id == sub_account_id,
+    )
+    result = session.scalars(stmt).first()
+    return result
+
+
+def get_sub_accounts(session: Session, user_id: UUID):
+    stmt = (
+        select(models.SubAccount)
+        .join(models.Account)
+        .where(
+            models.Account.user_id == user_id,
+            models.Account.deleted == False,
+        )
+    )
+
+    result = session.scalars(stmt).all()
+    return result
+
+
+def get_account_sub_accounts(session: Session, account_id: UUID):
+    stmt = select(models.SubAccount).where(
+        models.SubAccount.account_id == account_id,
+    )
+
+    result = session.scalars(stmt).all()
     return result

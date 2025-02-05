@@ -21,7 +21,7 @@ example: postgresql://bautista:pg123abc@container-name/postgres # from compose
 # Connection to db
 engine = create_engine(
     url=str(settings.sqlalchemy_database_uri),
-    echo=True,
+    # echo=True,
     # connect_args={"check_same_thread": False},  # only for sqlite
 )
 

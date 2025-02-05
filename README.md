@@ -24,6 +24,9 @@ To test:
 
 
 ## Database Migrations:
+- Migrations are controlled sets of changes developed to modify the structure of the objects within a relational database. They help transition database schemas from their current state to a new desired state. This means
+that a migration handles the changes on the code (the schema) and applies it to the database.
+
 - Always check the generated file and look at constraints, indexes, etc. to add names to them if they are not part of the naming dictionary.
 
 ### Inside the api container:

@@ -45,15 +45,13 @@ account_router = APIRouter(
 def create_account(
     session: database.SessionDep,
     current_user: CurrentUserDep,
-    account_data: schemas.AccountBase,
-    sub_accounts_data: List[schemas.SubAccountParameter],
+    account_data: schemas.CreateAccountParameters,
 ):
     try:
         return crud.create_account(
             session,
             current_user.id,
             account_data,
-            sub_accounts_data,
         )
     except Exception as e:
         raise HTTPException(

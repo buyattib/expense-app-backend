@@ -5,7 +5,7 @@ import sys
 
 logger = logging.getLogger()
 
-formatter = logging.Formatter(fmt="%(asctime)s %(levelname)s - %(message)s")
+formatter = logging.Formatter(fmt="%(levelname)s %(asctime)s - %(message)s")
 
 stream_handler = logging.StreamHandler(sys.stdout)
 stream_handler.setFormatter(formatter)
@@ -30,9 +30,18 @@ class LoggerMiddleware(BaseHTTPMiddleware):
         else:
             pass
 
-        # TODO: add info of the requester: ip, domain, etc
-        ip = request.client.host if request.client else None
-        log = {"path": request.url.path, "method": method, "ip": ip}
+        headers = request.headers
+        client = request.client
+
+        log = {
+            "path": request.url.path,
+            "method": method,
+            "ip": client.host if client else None,
+            "port": client.port if client else None,
+            "origin": headers["origin"],
+            "user-agent": headers["user-agent"],
+            "platform": headers.get("sec-ch-ua-platform"),
+        }
 
         logger.info(log, extra=log)
 

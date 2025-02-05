@@ -44,6 +44,11 @@ class TransactionBase(BaseModel):
     transaction_category_id: str
     sub_account_id: str
 
+    @field_validator("transaction_category_id", mode="before")
+    @classmethod
+    def transaction_category_id_to_string(cls, v):
+        return str(v) if isinstance(v, UUID) else v
+
     @field_validator("sub_account_id", mode="before")
     @classmethod
     def account_id_to_string(cls, v):
@@ -67,7 +72,7 @@ class TransactionSchema(TransactionBase):
         return str(v) if isinstance(v, UUID) else v
 
 
-### parameters and responses -----------
+### extended -----------
 
 
 class TransactionExtended(TransactionSchema):
@@ -75,6 +80,9 @@ class TransactionExtended(TransactionSchema):
     account: account_schemas.AccountSchema
 
     model_config = ConfigDict(from_attributes=True)
+
+
+### parameters -----------
 
 
 ### pydantinc list adapters

@@ -102,7 +102,7 @@ class SubAccountSchema(SubAccountBase):
         return str(v) if isinstance(v, UUID) else v
 
 
-### parameters and responses -----------
+### extended -----------
 
 
 class SubAccountExtended(SubAccountSchema):
@@ -118,9 +118,16 @@ class AccountExtended(AccountSchema):
     model_config = ConfigDict(from_attributes=True)
 
 
+### parameters ----------
+
+
 class SubAccountParameter(BaseModel):
     currency_id: str
     balance: int
+
+
+class CreateAccountParameters(AccountBase):
+    sub_accounts: list[SubAccountParameter]
 
 
 ### pydantinc list adapters
