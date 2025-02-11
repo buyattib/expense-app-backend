@@ -42,6 +42,7 @@ class AccountType(Base):
     description: Mapped[Optional[str]]
     deleted: Mapped[bool] = mapped_column(default=False)
 
+    # models relationships
     accounts: Mapped[List["Account"]] = relationship(back_populates="account_type")
 
 
@@ -88,6 +89,7 @@ class SubAccount(Base):
         server_default=func.gen_random_uuid(),
     )
     balance: Mapped[int] = mapped_column()  # saved in cents, ie, balance=100 is $1,00
+    deleted: Mapped[bool] = mapped_column(default=False)
 
     # foreign keys
     currency_id: Mapped[uuid.UUID] = mapped_column(ForeignKey("currencies.id"))

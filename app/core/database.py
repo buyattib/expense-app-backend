@@ -26,14 +26,6 @@ engine = create_engine(
 )
 
 
-# # only for sqlite
-# @event.listens_for(engine, "connect")
-# def enable_foreign_keys(dbapi_connection, connection_record):
-#     cursor = dbapi_connection.cursor()
-#     cursor.execute("PRAGMA foreign_keys=ON")
-#     cursor.close()
-
-
 # Session passed to each endpoint
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 

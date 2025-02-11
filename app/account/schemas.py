@@ -2,6 +2,8 @@ from uuid import UUID
 from typing import Annotated, Optional, List
 from pydantic import BaseModel, ConfigDict, TypeAdapter, field_validator
 from pydantic.types import StringConstraints
+
+from app.core.schemas import PaginationResponseSchema
 from .constants import AccountTypeEnum
 
 
@@ -127,7 +129,7 @@ class SubAccountParameter(BaseModel):
 
 
 class CreateAccountParameters(AccountBase):
-    sub_accounts: list[SubAccountParameter]
+    sub_accounts: List[SubAccountParameter]
 
 
 ### pydantinc list adapters

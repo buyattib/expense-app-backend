@@ -1,7 +1,7 @@
 from typing import List
 from fastapi import APIRouter, HTTPException, status
 
-from app.core import database
+from app.core import database, schemas as core_schemas
 from app.auth import CurrentUserDep
 from . import schemas, crud
 
@@ -60,10 +60,15 @@ def create_account(
         )
 
 
-@account_router.get("/", response_model=List[schemas.AccountExtended])
-def get_accounts(session: database.SessionDep, current_user: CurrentUserDep):
-    accounts = crud.get_accounts(session, current_user.id)
-    return accounts
+@account_router.get(
+    "/", response_model=core_schemas.PaginationResponseSchema[schemas.AccountExtended]
+)
+def get_accounts(
+    session: database.SessionDep,
+    current_user: CurrentUserDep,
+    pagination: core_schemas.PaginationDependency,
+):
+    return crud.get_accounts(session, current_user.id, pagination)
 
 
 @account_router.get("/{account_id}", response_model=schemas.AccountSchema)

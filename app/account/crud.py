@@ -1,7 +1,9 @@
 from uuid import UUID
-from typing import List, Union
+from typing import Union
 from sqlalchemy import select
-from sqlalchemy.orm import Session
+from sqlalchemy.orm import Session, selectinload, with_loader_criteria
+
+from app.core.schemas import PaginationParameters, paginate
 
 from . import models, schemas
 
@@ -102,27 +104,23 @@ def create_account(
     return db_account
 
 
-def get_accounts(session: Session, user_id: UUID):
+def get_accounts(session: Session, user_id: UUID, pagination: PaginationParameters):
     stmt = (
-        select(models.Account, models.AccountType)
-        .join(models.AccountType)
+        select(
+            models.Account,
+        )
+        .options(
+            with_loader_criteria(models.SubAccount, lambda sub: sub.deleted == False),
+            selectinload(models.Account.sub_accounts),
+            selectinload(models.Account.account_type),
+        )
         .where(
             models.Account.user_id == user_id,
             models.Account.deleted == False,
         )
     )
-    # stmt = (
-    #     select(models.Account, models.Currency, models.AccountType)
-    #     .join(models.Currency)
-    #     .join(models.AccountType)
-    #     .where(
-    #         models.Account.user_id == user_id,
-    #         models.Account.deleted == False,
-    #     )
-    # )
 
-    result = session.scalars(stmt).all()
-    return result
+    return paginate(session, stmt, pagination)
 
 
 def get_account(session: Session, account_id: Union[UUID, str]):

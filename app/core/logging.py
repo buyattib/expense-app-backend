@@ -38,7 +38,7 @@ class LoggerMiddleware(BaseHTTPMiddleware):
             "method": method,
             "ip": client.host if client else None,
             "port": client.port if client else None,
-            "origin": headers["origin"],
+            "origin": headers.get("origin"),
             "user-agent": headers["user-agent"],
             "platform": headers.get("sec-ch-ua-platform"),
         }
